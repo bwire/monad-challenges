@@ -26,3 +26,14 @@ randString3 = rs' 3 (mkSeed 1)
                  in letter : rs' (n - 1) s'
 
 -- More Generators
+generalA :: (a -> b) -> Gen a -> Gen b
+generalA f rnd = (\(t, s) -> (f t, s)) . rnd
+
+randEven :: Gen Integer
+randEven = generalA (*2) rand
+
+randOdd :: Gen Integer
+randOdd = generalA (+1) randEven
+
+randTen :: Gen Integer
+randTen = generalA (*10) rand
