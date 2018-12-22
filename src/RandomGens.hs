@@ -50,3 +50,13 @@ generalPair ga gb = \s0 ->
   let (v1, s1) = ga s0
       (v2, s2) = gb s1
   in ((v1, v2), s2)
+
+generalB :: (a -> b -> c) -> Gen a -> Gen b -> Gen c
+generalB f ga gb = \s0 ->
+  let (v1, s1) = ga s0
+      (v2, s2) = gb s1
+  in (f v1 v2, s2)
+
+randPair' :: Gen (Char, Integer)
+randPair' = generalB (,) randLetter rand  
+  
