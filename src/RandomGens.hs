@@ -2,6 +2,7 @@ module RandomGens where
 
 import MCPrelude
 import Control.Applicative
+import Data.Tuple (swap)
 
 type Gen t = Seed -> (t, Seed)
 
@@ -58,5 +59,12 @@ generalB f ga gb = \s0 ->
   in (f v1 v2, s2)
 
 randPair' :: Gen (Char, Integer)
-randPair' = generalB (,) randLetter rand  
-  
+randPair' = generalB (,) randLetter rand
+
+-- Generalizing Lists of Generators
+repRandom :: [Gen a] -> Gen [a] 
+repRandom gens = \s -> (swap . fmap reverse . swap) (foldr generate ([], s) gens)
+  where 
+    generate g (vals, st) =
+      let (val, st') = g st
+      in (val:vals, st')
