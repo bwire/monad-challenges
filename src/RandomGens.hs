@@ -68,3 +68,13 @@ repRandom gens = \s -> (swap . fmap reverse . swap) (foldr generate ([], s) gens
     generate g (vals, st) =
       let (val, st') = g st
       in (val:vals, st')
+
+-- Threading the random number state
+genTwo :: Gen a -> (a -> Gen b) -> Gen b
+genTwo g k = \s0 ->
+  let (a, s') = g s0
+  in k a s'
+
+mkGen :: a -> Gen a
+mkGen v = \s -> (v, s)
+
