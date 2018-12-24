@@ -63,8 +63,8 @@ link = flip chain
 queryGreek2 :: GreekData -> String -> Maybe Double
 queryGreek2 gData letter = 
   let mxs = lookupMay letter gData
-      mmax = chain (Just . fromIntegral) . chain maximumMay . chain tailMay $ mxs
-      mhead = chain (Just . fromIntegral) . chain headMay $ mxs
-  in chain (\a -> chain (\b -> divMay a b) mhead) mmax  
+      mmax = chain maximumMay . chain tailMay $ mxs
+      mhead = chain headMay $ mxs
+  in chain (\a -> chain (\b -> divMay (fromIntegral a) (fromIntegral b)) mhead) mmax  
 
   
