@@ -34,3 +34,37 @@ maximumMay (x:xs) = Just $ foldr max x xs
 minimumMay :: Ord a => [a] -> Maybe a
 minimumMay [] = Nothing
 minimumMay (x:xs) = Just $ foldr min x xs
+
+
+-- chains of failing computations
+queryGreek :: GreekData -> String -> Maybe Double
+queryGreek gData letter =  
+  case lookupMay letter gData of
+    Nothing -> Nothing
+    Just xs ->
+      case tailMay xs of 
+        Nothing -> Nothing
+        Just txs ->
+          case maximumMay txs of 
+            Nothing -> Nothing
+            Just mxs -> 
+              case headMay xs of
+                Nothing -> Nothing
+                Just h -> divMay (fromIntegral mxs) (fromIntegral h)
+
+-- Generalizing chains of failures
+chain :: (a -> Maybe b) -> Maybe a -> Maybe b
+chain _ Nothing = Nothing
+chain k (Just v) = k v
+
+link :: Maybe a -> (a -> Maybe b) -> Maybe b
+link = flip chain
+
+queryGreek2 :: GreekData -> String -> Maybe Double
+queryGreek2 gData letter = 
+  let mxs = lookupMay letter gData
+      mmax = chain (Just . fromIntegral) . chain maximumMay . chain tailMay $ mxs
+      mhead = chain (Just . fromIntegral) . chain headMay $ mxs
+  in chain (\a -> chain (\b -> divMay a b) mhead) mmax  
+
+  
