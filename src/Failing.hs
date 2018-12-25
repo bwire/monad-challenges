@@ -80,8 +80,40 @@ yLink f ma mb = chain (\a -> chain (\b -> mkMaybe $ f a b) mb) ma
 addSalaries2 :: [(String, Integer)] -> String -> String -> Maybe Integer
 addSalaries2 list p1 p2 = yLink (+) (lookupMay p1 list) (lookupMay p2 list)
 
+-- Tailprod
+tailProd :: Num a => [a] -> Maybe a
+tailProd xs = 
+  case tailMay xs of
+    Nothing -> Nothing
+    Just t -> mkMaybe . product $ t
 
+tailSum :: Num a => [a] -> Maybe a
+tailSum xs = 
+  case tailMay xs of
+    Nothing -> Nothing
+    Just t -> mkMaybe . sum $ t
 
-       
+transMaybe :: (a -> b) -> Maybe a -> Maybe b
+transMaybe f = chain (mkMaybe . f)
 
+tailProd2 :: Num a => [a] -> Maybe a
+tailProd2 = transMaybe product . tailMay
+
+tailSum2 :: Num a => [a] -> Maybe a
+tailSum2 = transMaybe sum . tailMay
+
+tailMax :: Ord a => [a] -> Maybe (Maybe a)
+tailMax = transMaybe maximumMay . tailMay
+
+tailMin :: Ord a => [a] -> Maybe (Maybe a)
+tailMin = transMaybe minimumMay . tailMay
+
+combine :: Maybe (Maybe a) -> Maybe a
+combine = chain . chain $ mkMaybe  
+
+tailMax2 :: Ord a => [a] -> Maybe a
+tailMax2 = combine . tailMax
+
+tailMin2 :: Ord a => [a] -> Maybe a
+tailMin2 = combine . tailMin
   
