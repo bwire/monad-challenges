@@ -35,7 +35,6 @@ minimumMay :: Ord a => [a] -> Maybe a
 minimumMay [] = Nothing
 minimumMay (x:xs) = Just $ foldr min x xs
 
-
 -- chains of failing computations
 queryGreek :: GreekData -> String -> Maybe Double
 queryGreek gData letter =  
@@ -66,5 +65,23 @@ queryGreek2 gData letter =
       mmax = chain maximumMay . chain tailMay $ mxs
       mhead = chain headMay $ mxs
   in chain (\a -> chain (\b -> divMay (fromIntegral a) (fromIntegral b)) mhead) mmax  
+ 
+-- Chaining variations
+mkMaybe :: a -> Maybe a
+mkMaybe = Just
+
+addSalaries :: [(String, Integer)] -> String -> String -> Maybe Integer
+addSalaries list p1 p2 = 
+  chain (\s1 -> chain ((\s2 -> mkMaybe (s1 + s2))) (lookupMay p2 list)) (lookupMay p1 list)
+
+yLink :: (a -> b -> c) -> Maybe a -> Maybe b -> Maybe c
+yLink f ma mb = chain (\a -> chain (\b -> mkMaybe $ f a b) mb) ma
+
+addSalaries2 :: [(String, Integer)] -> String -> String -> Maybe Integer
+addSalaries2 list p1 p2 = yLink (+) (lookupMay p1 list) (lookupMay p2 list)
+
+
+
+       
 
   
