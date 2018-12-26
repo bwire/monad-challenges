@@ -1,4 +1,4 @@
-module Failing where
+module Set2 where
 
 import Prelude (undefined) 
 import MCPrelude

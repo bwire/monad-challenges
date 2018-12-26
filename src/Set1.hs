@@ -1,4 +1,4 @@
-module RandomGens where
+module Set1 where
 
 import MCPrelude
 import Control.Applicative
