@@ -21,7 +21,7 @@ allCards is = concat . foldr (\b acc -> map (flip Card b) is : acc) []
 
 -- Generalizing pairs and cards
 allCombs :: (a -> b -> c) -> [a] -> [b] -> [c]
-allCombs f xas xbs = concatMap (\a -> map (f a) xbs) xas
+allCombs f xas xbs = concatMap (flip map xbs . f) xas
 
 allPairs' :: [a] -> [b] -> [(a, b)]
 allPairs' = allCombs (,)
