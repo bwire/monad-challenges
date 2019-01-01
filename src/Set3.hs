@@ -29,3 +29,6 @@ allPairs' = allCombs (,)
 allCards' :: [Int] -> [String] -> [Card]
 allCards' = allCombs Card
 
+-- Combinations of three things
+allCombs3 :: (a -> b -> c -> d) -> [a] -> [b] -> [c] -> [d]
+allCombs3 f xas xbs xcs = concatMap (\a -> allCombs (f a) xbs xcs) xas
