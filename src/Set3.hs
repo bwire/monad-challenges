@@ -1,5 +1,5 @@
 {-# LANGUAGE MonadComprehensions #-}
-{-# LANGUAGE RebindableSyntax  #-}
+{-# LANGUAGE RebindableSyntax #-}
 
 module Set3 where
 
@@ -32,3 +32,19 @@ allCards' = allCombs Card
 -- Combinations of three things
 allCombs3 :: (a -> b -> c -> d) -> [a] -> [b] -> [c] -> [d]
 allCombs3 f xas xbs xcs = concatMap (\a -> allCombs (f a) xbs xcs) xas
+ 
+-- Combinations of more things
+combStep :: [a -> b] -> [a] -> [b]    
+combStep = zipWith ($)
+
+allCombs' :: (a -> b -> c) -> [a] -> [b] -> [c]
+allCombs' f xs ys = map f xs `combStep` ys
+
+allCombs3' :: (a -> b -> c -> d) -> [a] -> [b] -> [c] -> [d]
+allCombs3' f xs ys zs = map f xs `combStep` ys `combStep` zs  
+
+allCombs4' :: (a -> b -> c -> d -> e) -> [a] -> [b] -> [c] -> [d] -> [e]
+allCombs4' f as bs cs ds = map f as `combStep` bs `combStep` cs `combStep` ds
+
+
+
