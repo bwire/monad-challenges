@@ -4,7 +4,7 @@
 module Set4 where
 
 import MCPrelude
-import Set2
+import Set2 (Maybe (..))
 
 class Monad m where
   return :: a -> m a
@@ -100,9 +100,85 @@ genTwo = bind
 mkGen :: a -> Gen a
 mkGen = return 
 
+-- Maybe overwritten using monad
 instance Monad Maybe where
-  return = mkMaybe
-  bind = flip chain
+  return = Just
+  bind Nothing _ = Nothing
+  bind (Just v) k = k v
+
+headMay :: [a] -> Maybe a
+headMay [] = Nothing
+headMay (x:_) = return x
+
+tailMay :: [a] -> Maybe [a]
+tailMay [] = Nothing
+tailMay (_:xs) = return xs
+
+lookupMay :: Eq a => a -> [(a, b)] -> Maybe b
+lookupMay v xs = foldl ff Nothing xs
+  where ff acc (a, b) = case acc of 
+                          Nothing -> if v == a then return b else Nothing 
+                          Just a -> acc
+
+divMay :: (Eq a, Fractional a) => a -> a -> Maybe a
+divMay n d | d == 0 = Nothing
+           | otherwise = return $ n / d
+
+maximumMay :: Ord a => [a] -> Maybe a
+maximumMay [] = Nothing
+maximumMay (x:xs) = return $ foldr max x xs
+
+minimumMay :: Ord a => [a] -> Maybe a
+minimumMay [] = Nothing
+minimumMay (x:xs) = return $ foldr min x xs
+
+queryGreek :: GreekData -> String -> Maybe Double
+queryGreek gData letter = 
+  lookupMay letter gData >>= 
+    \xs -> tailMay xs >>=
+    maximumMay >>=
+    \mxs -> headMay xs >>=
+    \h -> divMay (fromIntegral mxs) (fromIntegral h)
+
+chain :: (a -> Maybe b) -> Maybe a -> Maybe b
+chain = flip bind
+
+link :: Maybe a -> (a -> Maybe b) -> Maybe b
+link = bind
+
+mkMaybe :: a -> Maybe a
+mkMaybe = return
+
+addSalaries :: [(String, Integer)] -> String -> String -> Maybe Integer
+addSalaries list p1 p2 = liftM2 (+) (lookupMay p1 list) (lookupMay p2 list)
+ 
+yLink :: (a -> b -> c) -> Maybe a -> Maybe b -> Maybe c
+yLink = liftM2
+
+-- Tailprod
+tailProd :: Num a => [a] -> Maybe a
+tailProd = lift product . tailMay
+
+tailSum :: Num a => [a] -> Maybe a
+tailSum = lift sum . tailMay
+
+transMaybe :: (a -> b) -> Maybe a -> Maybe b
+transMaybe = lift  
+
+tailMax :: Ord a => [a] -> Maybe (Maybe a)
+tailMax = lift maximumMay . tailMay
+
+tailMin :: Ord a => [a] -> Maybe (Maybe a)
+tailMin = lift minimumMay . tailMay
+
+combine :: Maybe (Maybe a) -> Maybe a
+combine = join  
+
+tailMax2 :: Ord a => [a] -> Maybe a
+tailMax2 = join . tailMax
+
+tailMin2 :: Ord a => [a] -> Maybe a
+tailMin2 = join . tailMin
 
 instance Monad [] where
   return a = [a]
