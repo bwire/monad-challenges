@@ -83,8 +83,7 @@ generalB2 :: (a -> b -> c) -> Gen a -> Gen b -> Gen c
 generalB2 f ga gb = genTwo ga (\a -> genTwo gb (\b -> mkGen (f a b))) 
 
 repRandom2 :: [Gen a] -> Gen [a] 
-repRandom2 gens = generalA reverse $
-  foldr generate (mkGen []) gens
-    where generate g ga = genTwo g (flip generalA ga . (:))
+repRandom2 gens = foldr generate (mkGen []) gens
+  where generate g ga = genTwo g (flip generalA ga . (:))
 
 
