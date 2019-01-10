@@ -5,6 +5,7 @@ module Set4 where
 
 import MCPrelude
 import Set2 (Maybe (..))
+import Set3 (Card (..))
 
 class Monad m where
   return :: a -> m a
@@ -180,6 +181,33 @@ tailMax2 = join . tailMax
 tailMin2 :: Ord a => [a] -> Maybe a
 tailMin2 = join . tailMin
 
+
+-- List overwritten using monad
 instance Monad [] where
   return a = [a]
   bind = flip concatMap
+
+combStep :: [a -> b] -> [a] -> [b]    
+combStep = ap
+
+allCombs :: (a -> b -> c) -> [a] -> [b] -> [c]
+allCombs f xas xbs = xas >>= \a -> xbs >>= \b -> [f a b]
+
+allPairs :: [a] -> [b] -> [(a, b)]
+allPairs = allCombs (,) 
+
+allCards :: [Int] -> [String] -> [Card]
+allCards = allCombs Card 
+
+-- Generalizing pairs and cards
+allCombs' :: (a -> b -> c) -> [a] -> [b] -> [c]
+allCombs' f xs ys = map f xs `ap` ys
+
+allCombs3' :: (a -> b -> c -> d) -> [a] -> [b] -> [c] -> [d]
+allCombs3' f xs ys zs = map f xs `ap` ys `ap` zs  
+
+allCombs4' :: (a -> b -> c -> d -> e) -> [a] -> [b] -> [c] -> [d] -> [e]
+allCombs4' f as bs cs ds = map f as `ap` bs `ap` cs `ap` ds
+
+
+
